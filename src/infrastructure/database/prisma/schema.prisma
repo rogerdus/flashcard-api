@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id         String      @id @default(uuid())
+  name       String      @unique
+  flashcards Flashcard[]
+}
+
+model Flashcard {
+  id         String   @id @default(uuid())
+  question   String
+  answer     String
+  createdAt  DateTime @default(now())
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+}
