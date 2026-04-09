@@ -4,6 +4,8 @@ import { PrismaFlashcardRepository } from '../../repositories/flashcard.reposito
 import { PrismaCategoryRepository } from '../../repositories/category.repository'
 import { ListFlashcardsUseCase } from '../../../app/flashcards/list-flashcards.use-case'
 import { CreateFlashcardUseCase } from '../../../app/flashcards/create-flashcard-use-case'
+import { CategoryNotFoundError } from '../../../domain/errors/category-not-found.error'
+import { DomainError } from '../../../domain/errors/domain.error'
 
 const flashcardRepository = new PrismaFlashcardRepository()
 const categoryRepository = new PrismaCategoryRepository()
@@ -34,10 +36,12 @@ flashcardRoutes.post('/', async (req: Request, res: Response) => {
     const flashcard = await useCase.execute({ question, answer, categoryId })
     res.status(201).json(flashcard)
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Internal server error'
-    const status =
-      message.includes('required') || message.includes('not found') ? 400 : 500
-    res.status(status).json({ message })
+    if(error instanceof CategoryNotFoundError){
+      return res.status(404).json({message: error.message})
+    }
+    if(error instanceof DomainError){
+      return res.status(400).json({message: error.message})
+    }
+    res.status(500).json({ message: 'Internal server error' })
   }
 })

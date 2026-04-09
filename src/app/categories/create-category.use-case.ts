@@ -1,4 +1,5 @@
 import { Category } from '../../domain/entities/category/category.entity'
+import { CategoryAlreadyExistsError } from '../../domain/errors/category-alredy-exist.error'
 import { CategoryRepository } from '../../domain/ports/category/category.repository'
 
 export class CreateCategoryUseCase {
@@ -7,7 +8,7 @@ export class CreateCategoryUseCase {
   async execute (name: string): Promise<Category> {
     const exist = await this.categoryRepository.findByName(name?.trim())
     if (exist) {
-      throw new Error('Category already exists')
+        throw new CategoryAlreadyExistsError(name)
     }
 
     const category = Category.create({ id: crypto.randomUUID(), name })
