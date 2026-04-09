@@ -1,3 +1,6 @@
+import { Answer } from "../../value-objects/answer.vo"
+import { Question } from "../../value-objects/question.vo"
+
 export class FlashCard {
   private constructor (
     public readonly id: string,
@@ -14,13 +17,9 @@ export class FlashCard {
     answer: string
     categoryId: string
   }): FlashCard {
-    if (!props.question || props.question.trim().length === 0) {
-      throw new Error('Question is required')
-    }
 
-    if (!props.answer || props.answer.trim().length === 0) {
-      throw new Error('Answer is required')
-    }
+    const question = new Question(props.question)
+    const answer = new Answer(props.answer)
 
     if (!props.categoryId) {
       throw new Error('Category is required')

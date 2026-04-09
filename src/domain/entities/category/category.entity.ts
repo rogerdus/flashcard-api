@@ -1,3 +1,5 @@
+import { CategoryName } from '../../value-objects/category-name.vo'
+
 export class Category {
   private constructor (
     public readonly id: string,
@@ -7,9 +9,7 @@ export class Category {
   ) {}
 
   static create (props: { id: string; name: string }): Category {
-    if (!props.name || props.name.trim().length === 0) {
-      throw new Error('Category name is required')
-    }
+    const name = new CategoryName(props.name)
     return new Category(props.id, props.name, new Date(), new Date())
   }
 
