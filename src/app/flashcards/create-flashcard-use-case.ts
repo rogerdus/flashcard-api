@@ -1,6 +1,6 @@
 import { FlashcardRepository } from "../../domain/ports/flashcard/flashcard.repository";
 import { CategoryRepository } from "../../domain/ports/category/category.repository";
-import { FlashcardEntity } from "../../domain/entities/flashcard/flashcard.entity";
+import { FlashCard } from "../../domain/entities/flashcard/flashcard.entity";
 
 ///TODO CREATE DTO FIRST VERSION 
 interface CreateFlashcardInput {
@@ -15,28 +15,12 @@ export class CreateFlashcardUseCase {
         private readonly categoryRepository: CategoryRepository
     ) {}
 
-    async execute(input: CreateFlashcardInput): Promise<FlashcardEntity> {
-        const { question, answer, categoryId } = input;
-
-        if (!question || question.trim().length === 0) {
-            throw new Error("Question is required");
-        }
-        if (!answer || answer.trim().length === 0) {
-            throw new Error("Answer is required");
-        }
-        if (!categoryId) {
-            throw new Error("Category ID is required");
-        }
-
-        const category = await this.categoryRepository.findById(categoryId);
+    async execute(input: CreateFlashcardInput): Promise<FlashCard> {
+        const category = await this.categoryRepository.findById(input.categoryId);
         if (!category) {
-            throw new Error(`Category with id "${categoryId}" not found`);
+            throw new Error(`Category with id "${input.categoryId}" not found`);
         }
-
-        return this.flashcardRepository.create({
-            question: question.trim(),
-            answer: answer.trim(),
-            categoryId,
-        });
+        const flashcard = FlashCard.create({id: crypto.randomUUID(), ...input});
+        return this.flashcardRepository.save(flashcard);
     }
 }

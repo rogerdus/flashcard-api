@@ -16,9 +16,14 @@ export class Category {
   static fromPrimitives (data: {
     id: string
     name: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date | null
+    updatedAt: Date | null
   }): Category {
-    return new Category(data.id, data.name, data.createdAt, data.updatedAt)
+    return new Category(
+      data.id,
+      data.name,
+      data.createdAt ?? new Date(),
+      data.updatedAt ?? new Date()
+    )
   }
 }

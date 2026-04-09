@@ -40,16 +40,16 @@ export class FlashCard {
     question: string
     answer: string
     categoryId: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date | null
+    updatedAt: Date | null
   }): FlashCard {
     return new FlashCard(
       data.id,
       data.question,
       data.answer,
       data.categoryId,
-      data.createdAt,
-      data.updatedAt
+      data.createdAt ? new Date(data.createdAt) : new Date(),
+      data.updatedAt ? new Date(data.updatedAt) : new Date()
     )
   }
 }
