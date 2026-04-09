@@ -1,12 +1,11 @@
 import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-import { PrismaCategoryRepository } from "../../repositories/category.repository";
-import { ListCategoriesUseCase } from "../../../app/categories/list-categories.use-case";
-import { CreateCategoryUseCase } from "../../../app/categories/create-category.use-case";
+
+import { PrismaCategoryRepository } from "../../repositories/category.repository.js";
+import { ListCategoriesUseCase } from "../../../app/categories/list-categories.use-case.js";
+import { CreateCategoryUseCase } from "../../../app/categories/create-category.use-case.js";
 
 
-const prisma = new PrismaClient();
-const categoryRepository = new PrismaCategoryRepository(prisma);
+const categoryRepository = new PrismaCategoryRepository();
 
 export const categoryRoutes = Router();
 

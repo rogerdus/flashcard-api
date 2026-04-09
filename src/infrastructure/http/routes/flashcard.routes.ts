@@ -1,13 +1,12 @@
 import { Router, Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+
 import { PrismaFlashcardRepository } from '../../repositories/flashcard.repository'
 import { PrismaCategoryRepository } from '../../repositories/category.repository'
 import { ListFlashcardsUseCase } from '../../../app/flashcards/list-flashcards.use-case'
 import { CreateFlashcardUseCase } from '../../../app/flashcards/create-flashcard-use-case'
 
-const prisma = new PrismaClient()
-const flashcardRepository = new PrismaFlashcardRepository(prisma)
-const categoryRepository = new PrismaCategoryRepository(prisma)
+const flashcardRepository = new PrismaFlashcardRepository()
+const categoryRepository = new PrismaCategoryRepository()
 
 export const flashcardRoutes = Router()
 

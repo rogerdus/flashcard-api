@@ -14,6 +14,6 @@ export class CreateCategoryUseCase {
             throw new Error("Category already exists");
         }
 
-        return this.categoryRepository.create(name.trim();   
+        return this.categoryRepository.create(name.trim());
     }
 }
