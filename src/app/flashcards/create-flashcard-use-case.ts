@@ -2,6 +2,7 @@ import { FlashcardRepository } from "../../domain/ports/flashcard/flashcard.repo
 import { CategoryRepository } from "../../domain/ports/category/category.repository";
 import { FlashCard } from "../../domain/entities/flashcard/flashcard.entity";
 import { CategoryNotFoundError } from "../../domain/errors/category-not-found.error";
+import { EventBus } from "../../domain/ports/event-bus.port";
 
 ///TODO CREATE DTO FIRST VERSION 
 interface CreateFlashcardInput {
@@ -13,7 +14,8 @@ interface CreateFlashcardInput {
 export class CreateFlashcardUseCase {
     constructor(
         private readonly flashcardRepository: FlashcardRepository,
-        private readonly categoryRepository: CategoryRepository
+        private readonly categoryRepository: CategoryRepository,
+        private readonly eventBus: EventBus
     ) {}
 
     async execute(input: CreateFlashcardInput): Promise<FlashCard> {
@@ -22,6 +24,11 @@ export class CreateFlashcardUseCase {
             throw new CategoryNotFoundError(input.categoryId);
         }
         const flashcard = FlashCard.create({id: crypto.randomUUID(), ...input});
-        return this.flashcardRepository.save(flashcard);
+
+        await this.flashcardRepository.save(flashcard);
+
+        await this.eventBus.publish(flashcard.pullEvent());
+
+        return flashcard;
     }
 }

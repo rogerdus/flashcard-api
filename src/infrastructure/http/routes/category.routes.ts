@@ -6,9 +6,11 @@ import { CreateCategoryUseCase } from "../../../app/categories/create-category.u
 import { CategoryAlreadyExistsError } from "../../../domain/errors/category-alredy-exist.error"
 import { DomainError } from "../../../domain/errors/domain.error"
 import { toCategoryResponseDto } from "../dtos/category.dto"
+import { InMemoryEventBus } from "../../events/in-memory-event-bus"
 
 const categoryRepository = new PrismaCategoryRepository()
 export const categoryRoutes = Router()
+const eventBus = new InMemoryEventBus()
 
 // GET /categories
 categoryRoutes.get("/", async (_req: Request, res: Response) => {
@@ -25,7 +27,7 @@ categoryRoutes.get("/", async (_req: Request, res: Response) => {
 categoryRoutes.post("/", async (req: Request, res: Response) => {
   try {
     const { name } = req.body
-    const useCase = new CreateCategoryUseCase(categoryRepository)
+    const useCase = new CreateCategoryUseCase(categoryRepository, eventBus)
     const category = await useCase.execute(name)
     res.status(201).json(toCategoryResponseDto(category))
   } catch (error) {
