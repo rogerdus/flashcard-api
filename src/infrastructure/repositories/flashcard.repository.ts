@@ -1,48 +1,32 @@
 import { prisma } from '../adapters/prisma'
 import { FlashcardRepository } from '../../domain/ports/flashcard/flashcard.repository'
-import { FlashcardEntity } from '../../domain/entities/flashcard/flashcard.entity'
+import { FlashCard } from '../../domain/entities/flashcard/flashcard.entity'
 
 export class PrismaFlashcardRepository implements FlashcardRepository {
   constructor () {}
 
-  async create (data: {
-    question: string
-    answer: string
-    categoryId: string
-  }): Promise<FlashcardEntity> {
-    const flashcard = await prisma.flashcard.create({ data })
-    return this.toEntity(flashcard)
+  async save (flashcard: FlashCard): Promise<FlashCard> {
+    const raw = await prisma.flashcard.create({
+      data: {
+        id: flashcard.id,
+        question: flashcard.question,
+        answer: flashcard.answer,
+        categoryId: flashcard.categoryId
+      }
+    })
+    return FlashCard.fromPrimitives(raw)
   }
 
-  async findAll (categoryId?: string): Promise<FlashcardEntity[]> {
-    const flashcards = await prisma.flashcard.findMany({
+  async findAll (categoryId: string): Promise<FlashCard[]> {
+    const rows = await prisma.flashcard.findMany({
       where: categoryId ? { categoryId } : undefined,
       orderBy: { createdAt: 'asc' }
     })
-    return flashcards.map(this.toEntity)
+    return rows.map(FlashCard.fromPrimitives)
   }
 
-  async findById (id: string): Promise<FlashcardEntity | null> {
-    const flashcard = await prisma.flashcard.findUnique({
-      where: { id }
-    })
-    return flashcard ? this.toEntity(flashcard) : null
-  }
-
-  private toEntity (flashcard: {
-    id: string
-    question: string
-    answer: string
-    createdAt: Date
-    updatedAt: Date | null
-    categoryId: string
-  }): FlashcardEntity {
-    return {
-      id: flashcard.id,
-      question: flashcard.question,
-      answer: flashcard.answer,
-      createdAt: flashcard.createdAt,
-      updatedAt: flashcard.updatedAt ?? flashcard.createdAt
-    }
+  async findById (id: string): Promise<FlashCard | null> {
+    const raw = await prisma.flashcard.findUnique({ where: { id } })
+    return raw ? FlashCard.fromPrimitives(raw) : null
   }
 }

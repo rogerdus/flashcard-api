@@ -1,50 +1,37 @@
 import { prisma } from '../adapters/prisma'
 
 import { CategoryRepository } from '../../domain/ports/category/category.repository'
-import { CategoryEntity } from '../../domain/entities/category/category.entity'
+import { Category } from '../../domain/entities/category/category.entity'
 
 export class PrismaCategoryRepository implements CategoryRepository {
   constructor () {}
 
-  async create (name: string): Promise<CategoryEntity> {
-    const category = await prisma.category.create({
-      data: { name }
+  async save (category: Category): Promise<Category> {
+    const raw = await prisma.category.create({
+      data: {
+        id: category.id,
+        name: category.name
+      }
     })
-    return this.toEntity(category)
+    return Category.fromPrimitives(raw)
   }
 
-  async findAll (): Promise<CategoryEntity[]> {
-    const categories = await prisma.category.findMany({
-      orderBy: { createdAt: 'asc' }
+  async findAll (): Promise<Category[]> {
+    const rows = await prisma.category.findMany({
+      orderBy: {
+        createdAt: 'asc'
+      }
     })
-    return categories.map(this.toEntity)
+    return rows.map(Category.fromPrimitives)
   }
 
-  async findById (id: string): Promise<CategoryEntity | null> {
-    const category = await prisma.category.findUnique({
-      where: { id }
-    })
-    return category ? this.toEntity(category) : null
+  async findById (id: string): Promise<Category | null> {
+    const raw = await prisma.category.findUnique({ where: { id } })
+    return raw ? Category.fromPrimitives(raw) : null
   }
 
-  async findByName (name: string): Promise<CategoryEntity | null> {
-    const category = await prisma.category.findUnique({
-      where: { name }
-    })
-    return category ? this.toEntity(category) : null
-  }
-
-  private toEntity (category: {
-    id: string
-    name: string
-    createdAt: Date
-    updatedAt: Date | null
-  }): CategoryEntity {
-    return {
-      id: category.id,
-      name: category.name,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt ?? category.createdAt
-    }
+  async findByName (name: string): Promise<Category | null> {
+    const raw = await prisma.category.findUnique({ where: { name } })
+    return raw ? Category.fromPrimitives(raw) : null
   }
 }

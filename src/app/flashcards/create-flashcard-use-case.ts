@@ -1,6 +1,8 @@
 import { FlashcardRepository } from "../../domain/ports/flashcard/flashcard.repository";
 import { CategoryRepository } from "../../domain/ports/category/category.repository";
-import { FlashcardEntity } from "../../domain/entities/flashcard/flashcard.entity";
+import { FlashCard } from "../../domain/entities/flashcard/flashcard.entity";
+import { CategoryNotFoundError } from "../../domain/errors/category-not-found.error";
+import { EventBus } from "../../domain/ports/event-bus.port";
 
 ///TODO CREATE DTO FIRST VERSION 
 interface CreateFlashcardInput {
@@ -12,31 +14,21 @@ interface CreateFlashcardInput {
 export class CreateFlashcardUseCase {
     constructor(
         private readonly flashcardRepository: FlashcardRepository,
-        private readonly categoryRepository: CategoryRepository
+        private readonly categoryRepository: CategoryRepository,
+        private readonly eventBus: EventBus
     ) {}
 
-    async execute(input: CreateFlashcardInput): Promise<FlashcardEntity> {
-        const { question, answer, categoryId } = input;
-
-        if (!question || question.trim().length === 0) {
-            throw new Error("Question is required");
-        }
-        if (!answer || answer.trim().length === 0) {
-            throw new Error("Answer is required");
-        }
-        if (!categoryId) {
-            throw new Error("Category ID is required");
-        }
-
-        const category = await this.categoryRepository.findById(categoryId);
+    async execute(input: CreateFlashcardInput): Promise<FlashCard> {
+        const category = await this.categoryRepository.findById(input.categoryId);
         if (!category) {
-            throw new Error(`Category with id "${categoryId}" not found`);
+            throw new CategoryNotFoundError(input.categoryId);
         }
+        const flashcard = FlashCard.create({id: crypto.randomUUID(), ...input});
 
-        return this.flashcardRepository.create({
-            question: question.trim(),
-            answer: answer.trim(),
-            categoryId,
-        });
+        await this.flashcardRepository.save(flashcard);
+
+        await this.eventBus.publish(flashcard.pullEvent());
+
+        return flashcard;
     }
 }
