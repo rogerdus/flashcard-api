@@ -1,10 +1,10 @@
 import { CategoryRepository } from '../../domain/ports/category/category.repository'
-import { CategoryEntity } from '../../domain/entities/category/category.entity'
+import { Category } from '../../domain/entities/category/category.entity'
 
 export class ListCategoriesUseCase {
   constructor (private readonly categoryRepository: CategoryRepository) {}
 
-  async execute (): Promise<CategoryEntity[]> {
+  async execute (): Promise<Category[]> {
     return this.categoryRepository.findAll()
   }
 }
