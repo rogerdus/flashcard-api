@@ -1,10 +1,10 @@
 import { FlashcardRepository } from "../../domain/ports/flashcard/flashcard.repository";
-import { FlashcardEntity } from "../../domain/entities/flashcard/flashcard.entity";
+import { FlashCard } from "../../domain/entities/flashcard/flashcard.entity";
 
 export class ListFlashcardsUseCase {
     constructor(private readonly flashcardRepository: FlashcardRepository) {}
 
-    async execute(categoryId?: string): Promise<FlashcardEntity[]> {
+    async execute(categoryId?: string): Promise<FlashCard[]> {
         return this.flashcardRepository.findAll(categoryId);
     }
 }

@@ -4,7 +4,8 @@ import { Answer } from '../../value-objects/answer.vo'
 import { Question } from '../../value-objects/question.vo'
 
 export class FlashCard {
-  private _events: DomainEvent[] = [];
+  private _events: DomainEvent[] = []
+  private _archivedAt: Date | null
 
   private constructor (
     public readonly id: string,
@@ -12,11 +13,23 @@ export class FlashCard {
     public readonly answer: string,
     public readonly categoryId: string,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date
-  ) {}
+    public readonly updatedAt: Date,
+    archivedAt: Date | null = null
+  ) {
+    this._archivedAt = archivedAt
+  }
+
+  get isArchived () {
+    return this._archivedAt !== null
+  }
+
+  archive () {
+    if (this.isArchived) return
+    this._archivedAt = new Date()
+  }
 
   pullEvent (): DomainEvent[] {
-    const events = this._events
+    const events = [...this._events]
     this._events = []
     return events
   }
@@ -54,12 +67,13 @@ export class FlashCard {
   }
 
   static fromPrimitives (data: {
-    id: string
-    question: string
-    answer: string
-    categoryId: string
-    createdAt: Date | null
-    updatedAt: Date | null
+    id: string;
+    question: string;
+    answer: string;
+    categoryId: string;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    archivedAt?: Date | null;
   }): FlashCard {
     return new FlashCard(
       data.id,
@@ -67,7 +81,8 @@ export class FlashCard {
       data.answer,
       data.categoryId,
       data.createdAt ? new Date(data.createdAt) : new Date(),
-      data.updatedAt ? new Date(data.updatedAt) : new Date()
+      data.updatedAt ? new Date(data.updatedAt) : new Date(),
+      data.archivedAt ?? null,
     )
   }
 }
