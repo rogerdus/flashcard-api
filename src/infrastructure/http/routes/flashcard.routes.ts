@@ -33,7 +33,6 @@ flashcardRoutes.post('/', async (req: Request, res: Response) => {
   try {
     const { question, answer, categoryId } = req.body
     const useCase = new CreateFlashcardUseCase(
-      flashcardRepository,
       categoryRepository,
       eventBus
     )

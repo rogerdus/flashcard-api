@@ -1,16 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CreateFlashcardUseCase } from "./create-flashcard-use-case";
-import { FlashcardRepository } from "../../domain/ports/flashcard/flashcard.repository";
 import { CategoryRepository } from "../../domain/ports/category/category.repository";
 import { EventBus } from "../../domain/ports/event-bus.port";
 import { Category } from "../../domain/entities/category/category.entity";
 import { CategoryNotFoundError } from "../../domain/errors/category-not-found.error";
 
-const mockFlashcardRepository: FlashcardRepository = {
-    save: vi.fn(),
-    findAll: vi.fn(),
-    findById: vi.fn(),
-};
 
 const mockCategoryRepository: CategoryRepository = {
     save: vi.fn(),
@@ -29,7 +23,6 @@ describe("CreateFlashcardUseCase", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         useCase = new CreateFlashcardUseCase(
-            mockFlashcardRepository,
             mockCategoryRepository,
             mockEventBus,
         );
@@ -44,7 +37,7 @@ describe("CreateFlashcardUseCase", () => {
         });
 
         vi.mocked(mockCategoryRepository.findById).mockResolvedValue(category);
-        vi.mocked(mockFlashcardRepository.save).mockImplementation(
+        vi.mocked(mockCategoryRepository.save).mockImplementation(
             async (flashcard) => flashcard
         );
 
@@ -55,7 +48,7 @@ describe("CreateFlashcardUseCase", () => {
         });
 
         expect(result.question).toBe("¿Qué es DDD?");
-        expect(mockFlashcardRepository.save).toHaveBeenCalledOnce();
+        expect(mockCategoryRepository.save).toHaveBeenCalledOnce();
         expect(mockEventBus.publish).toHaveBeenCalledOnce();
     });
 
@@ -68,6 +61,6 @@ describe("CreateFlashcardUseCase", () => {
             categoryId: "cat-999",
         })).rejects.toThrow(CategoryNotFoundError);
 
-        expect(mockFlashcardRepository.save).not.toHaveBeenCalled();
+        expect(mockCategoryRepository.save).not.toHaveBeenCalled();
     });
 });

@@ -26,7 +26,12 @@ export class PrismaCategoryRepository implements CategoryRepository {
   }
 
   async findById (id: string): Promise<Category | null> {
-    const raw = await prisma.category.findUnique({ where: { id } })
+    const raw = await prisma.category.findUnique({
+      where: { id },
+      include: {
+        flashcards: true
+      }
+    });
     return raw ? Category.fromPrimitives(raw) : null
   }
 
