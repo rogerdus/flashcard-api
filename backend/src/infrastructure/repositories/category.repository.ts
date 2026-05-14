@@ -7,12 +7,35 @@ export class PrismaCategoryRepository implements CategoryRepository {
   constructor () {}
 
   async save (category: Category): Promise<Category> {
-    const raw = await prisma.category.create({
-      data: {
+    const raw = await prisma.category.upsert({
+      where: { id: category.id },
+      create: {
         id: category.id,
+        name: category.name
+      },
+      update: {
         name: category.name
       }
     })
+
+    for (const flashcard of category.flashcards) {
+      await prisma.flashcard.upsert({
+        where: { id: flashcard.id },
+        create: {
+          id: flashcard.id,
+          question: flashcard.question,
+          answer: flashcard.answer,
+          categoryId: flashcard.categoryId,
+          createdAt: flashcard.createdAt,
+          updatedAt: flashcard.updatedAt
+        },
+        update: {
+          question: flashcard.question,
+          answer: flashcard.answer
+        }
+      })
+    }
+
     return Category.fromPrimitives(raw)
   }
 

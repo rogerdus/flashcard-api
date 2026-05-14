@@ -17,7 +17,7 @@ export class PrismaFlashcardRepository implements FlashcardRepository {
     return FlashCard.fromPrimitives(raw)
   }
 
-  async findAll (categoryId: string): Promise<FlashCard[]> {
+  async findAll (categoryId?: string): Promise<FlashCard[]> {
     const rows = await prisma.flashcard.findMany({
       where: categoryId ? { categoryId } : undefined,
       orderBy: { createdAt: 'asc' }
