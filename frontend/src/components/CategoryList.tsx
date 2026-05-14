@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react'
 import { getCategories } from '../api'
+import type { Category } from '../types'
 
-export default function CategoryList({ selectedCategoryId, onSelectCategory, refreshKey }) {
-  const [categories, setCategories] = useState([])
+interface CategoryListProps {
+  selectedCategoryId: string | null
+  onSelectCategory: (id: string | null) => void
+  refreshKey: number
+}
+
+export default function CategoryList({ selectedCategoryId, onSelectCategory, refreshKey }: CategoryListProps) {
+  const [categories, setCategories] = useState<Category[]>([])
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -20,6 +27,7 @@ export default function CategoryList({ selectedCategoryId, onSelectCategory, ref
         onClick={() => onSelectCategory(null)}
       >
         Todas
+        <span className="category-count">{categories.length}</span>
       </button>
       {categories.map((cat) => (
         <button
